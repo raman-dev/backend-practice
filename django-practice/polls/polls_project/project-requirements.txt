@@ -1,0 +1,19 @@
+Polls App
+-----------
+    Primary Questions
+    -------------------
+    - what does it do?
+        present a poll question
+        offer multiple choice options
+    - why build this?
+        practice backend django and thought process
+    - minimum functionality
+        show a question choices and 
+        poll results
+
+    Secondary Questions
+    --------------------
+    - what does it look like?
+    - user login? no user login? no users?
+    - random survey?
+    
