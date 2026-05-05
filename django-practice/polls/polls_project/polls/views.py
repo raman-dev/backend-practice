@@ -31,6 +31,8 @@ def login_page(request):
 
 @require_POST
 def login_request(request):
+
+    print(request)
     username = request.POST.get('username')
     password = request.POST.get('password')
 
