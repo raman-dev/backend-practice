@@ -58,9 +58,14 @@ def logout_request(request):
 @login_required
 @require_POST
 def submit_answer(request,questionId):
+
+
     data = request.POST.copy()
+    
     data['question'] = questionId
-    qaForm = QuestionAnswerForm(data)
+
+    
+    qaForm = QuestionAnswerForm(data={'question':data['question'],'answer':int(data['answer'][0])})
     if qaForm.is_valid():
         #increment question answered count
         with transaction.atomic():
@@ -71,5 +76,12 @@ def submit_answer(request,questionId):
             answer = qaForm.cleaned_data['answer']
             answer.count += 1
             answer.save()
-        return JsonResponse({"message":"Answer submitted successfully"})    
+        return render(request,"/",context={
+            'question': question,
+            'answers': Answer.objects.filter(question=question),
+            'answered':True,
+            'selectedAnswer':answer
+        })
+    else:
+        print(qaForm.errors)    
     return JsonResponse({"message":"Invalid data"},status=400)

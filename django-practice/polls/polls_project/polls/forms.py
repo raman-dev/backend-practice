@@ -6,6 +6,8 @@ class QuestionAnswerForm(forms.Form):
     answer = forms.ModelChoiceField(queryset=Answer.objects.none())
     question = forms.ModelChoiceField(queryset=Question.objects.all())
 
+    
+
     def clean(self):
         # return super().clean()
         #make sure answer.question foreign key equals question

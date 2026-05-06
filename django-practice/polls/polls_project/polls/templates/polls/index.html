@@ -28,10 +28,9 @@
     <form action="/submit-answer/{{ question.id }}" method="POST">
       {% csrf_token %} {% for answer in answers %}
       <div class="form-check border rounded-2 p-0">
-        <input
-          required
+        <input {% if answered and selectedAnswer.id == answer.id %} checked {% endif %} required
           class="btn-check"
-          name="options-base"
+          name="answer"
           type="radio"
           value="{{answer.id}}"
           id="answer-{{answer.id}}" />
