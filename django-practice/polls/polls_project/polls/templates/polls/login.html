@@ -2,7 +2,7 @@
 {% block content%}
 <div class="container-fluid">
     <h3>Login</h3>
-    <form class="d-flex flex-column" style="max-width: 280px;" method="POST">
+    <form class="d-flex flex-column" style="max-width: 280px;" method="POST" action="/login">
         {% csrf_token %}
         <input type="text" name="username">
         <input type="password" name="password">

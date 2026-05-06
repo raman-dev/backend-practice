@@ -1,22 +1,50 @@
-{% extends "polls/base.html" %}
-{% block content %}
-<h1 class="text-center">Polls</h1>
+{% extends "polls/base.html" %} {% block content %}
+<div class="d-flex justify-content-end">
+  <div class="profile-summary border d-flex flex-column p-2  m-1 mx-2">
+    {% if user.is_authenticated %}
+    <p class="m-0">Logged in as:</p>
+    <h4 class="m-0">{{ user.username }}</h4>
+    <form action="/logout" method="POST">
+      {% csrf_token %}
+      <div class="d-flex justify-content-end my-2 mb-1">
+        
+      <button class="btn btn-primary">logout</button>
+      </div>
+    </form>
+    {% endif %}
+  </div>
+</div>
+
 <div class="container-fluid d-flex justify-content-center align-items-center">
-  <div class="border border-1 rounded-2 p-3" style="width: fit-content; min-width: 400px;">
+   
+  <div
+    class="poll-container border border-1 rounded-2 p-3"
+    style="width: fit-content; min-width: 400px">
+    <div class="title-container w-100">
+    <h1 class="text-center">Polls</h1>
+  </div>
     <p class="current-poll" id="{{question.id}}">{{ question }}</p>
 
     <form action="/submit-answer/{{ question.id }}" method="POST">
-      {% csrf_token %}
-      {% for answer in answers %}
+      {% csrf_token %} {% for answer in answers %}
       <div class="form-check border rounded-2 p-0">
-        <input class="btn-check" name="options-base" type="radio" value="{{answer.id}}" id="answer-{{answer.id}}">
-        <label class="btn p-1 px-2 text-start" for="answer-{{answer.id}}" style="width: fit-content; min-width: 400px;">
+        <input
+          required
+          class="btn-check"
+          name="options-base"
+          type="radio"
+          value="{{answer.id}}"
+          id="answer-{{answer.id}}" />
+        <label
+          class="btn p-1 px-2 text-start"
+          for="answer-{{answer.id}}"
+          style="width: fit-content; min-width: 400px">
           {{answer}}
         </label>
-      </div>    
+      </div>
       {% endfor %}
       <div class="d-flex justify-content-end">
-        <button class="btn btn-primary" type="submit">Submit</button>
+        <button class="btn btn-primary submit-btn" type="submit">Submit</button>
       </div>
     </form>
     <div class="stats mt-1">
@@ -25,35 +53,12 @@
   </div>
 </div>
 <script>
-  //grab all poll ids into a set
-  const pollIds = document.querySelectorAll(".list-group-item");
-  const pollIdsSet = new Set();
-  pollIds.forEach((pollId) => {
-    pollIdsSet.add(pollId.id);
-  });
 
-
-  //on click li.answer make active
-  const answers = document.querySelectorAll(".answer");
-  let selectedAnswerId = null;
-  let selectedQuestionId = null;
-  //check for current active answer and make it selectedAnswerId
-  const activeAnswer = document.querySelector(".answer.active");
-  if (activeAnswer) {
-    selectedAnswerId = activeAnswer.id;
-  }
-
-  answers.forEach((answer) => {
-    answer.addEventListener("click", (e) => {
-      //remove active class from all answers
-      answers.forEach((answer) => {
-        answer.classList.remove("active");
-      });
-      //add active class to clicked answer
-      answer.classList.add("active");
-      selectedAnswerId = answer.id;
-      selectedQuestionId = document.querySelector(".current-poll").id;
-    });
-  });
+  // const submitBtn = document.querySelector('.submit-btn');
+  // const formSubmit = document.querySelector('form');
+  // formSubmit.addEventListener('submit',(event) => {
+  //     //stop default if nothing is selected
+  //     event.target.querySelector("input:checked");
+  // });
 </script>
 {% endblock %}

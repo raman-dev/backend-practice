@@ -1,11 +1,11 @@
 from urllib import request
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.db import transaction
 from django.http import JsonResponse
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 
 from .forms import QuestionAnswerForm
 from .models import Question,Answer
@@ -35,25 +35,29 @@ def login_page(request):
 @require_POST
 def login_request(request):
 
-    print(request)
+    # print(request)
     username = request.POST.get('username')
     password = request.POST.get('password')
 
     user = authenticate(request, username=username, password=password)
     if user is not None:
         login(request,user)
+        return redirect("/")
+
+    return JsonResponse({"error":"Unauthorized"},status=401)
     
-    pass
+    
 
 
-#
+@require_POST
+def logout_request(request):
+    logout(request)
+
+    return redirect('/')
+
 @login_required
 @require_POST
 def submit_answer(request,questionId):
-    if request.user.is_authenticated:
-        print("User is authenticated")
-        return JsonResponse({"message":"User is authenticated"})
-    pass
     data = request.POST.copy()
     data['question'] = questionId
     qaForm = QuestionAnswerForm(data)
