@@ -22,7 +22,6 @@ def index(request):
     context = {
         'question': randomQuestion,
         'answers': Answer.objects.filter(question=randomQuestion),
-        'responses':randomQuestion.answered_count
     }
 
     return render(request,"polls/index.html",context=context)
@@ -58,25 +57,23 @@ def logout_request(request):
 @login_required
 @require_POST
 def submit_answer(request,questionId):
-
-
-    data = request.POST.copy()
     
+    data = request.POST.copy()
     data['question'] = questionId
-
     
     qaForm = QuestionAnswerForm(data={'question':data['question'],'answer':int(data['answer'][0])})
     if qaForm.is_valid():
         #increment question answered count
         with transaction.atomic():
-            question = qaForm.cleaned_data['question']
+            question = Question.objects.filter(id=questionId).first()
             question.answered_count += 1
             question.save()
             #increment answer count
-            answer = qaForm.cleaned_data['answer']
-            answer.count += 1
+            answerId = qaForm.cleaned_data['answer']
+            answer = Answer.objects.filter(id=answerId).first()
+            answer.picked += 1
             answer.save()
-        return render(request,"/",context={
+        return render(request,template_name="polls/index.html",context={
             'question': question,
             'answers': Answer.objects.filter(question=question),
             'answered':True,

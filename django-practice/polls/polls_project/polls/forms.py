@@ -3,18 +3,26 @@ from django import forms
 from .models import Answer,Question
 
 class QuestionAnswerForm(forms.Form):
-    answer = forms.ModelChoiceField(queryset=Answer.objects.none())
-    question = forms.ModelChoiceField(queryset=Question.objects.all())
+    answer = forms.IntegerField()
+    question = forms.IntegerField()
 
-    
+   
 
     def clean(self):
         # return super().clean()
         #make sure answer.question foreign key equals question
         cleaned_data = super().clean()
-        answer = cleaned_data.get("answer")
-        question = cleaned_data.get("question")
-        if answer and question:
-            if answer.question != question:
-                raise forms.ValidationError("Answer does not belong to the question")
+            
+        answerId = self.cleaned_data.get("answer")
+        questionId = self.cleaned_data.get("question")
+
+        q = Question.objects.filter(id=questionId).first()
+        a = Answer.objects.filter(id=answerId).first()
+
+        if not q or not a:    
+            raise forms.ValidationError("Invalid question or answer")
+        
+        if a.question != q:
+            raise forms.ValidationError("Answer does not belong to question")
+        
         return cleaned_data
