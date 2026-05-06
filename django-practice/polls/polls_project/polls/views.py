@@ -1,3 +1,5 @@
+from urllib import request
+
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
@@ -27,6 +29,7 @@ def index(request):
 
 
 def login_page(request):
+    print("Login page requested")
     return render(request,"polls/login.html")
 
 @require_POST
@@ -43,10 +46,17 @@ def login_request(request):
     pass
 
 
-@login_required(login_url="/login")
+#
+@login_required
 @require_POST
-def submit_answer(request):
-    qaForm = QuestionAnswerForm(request.POST)
+def submit_answer(request,questionId):
+    if request.user.is_authenticated:
+        print("User is authenticated")
+        return JsonResponse({"message":"User is authenticated"})
+    pass
+    data = request.POST.copy()
+    data['question'] = questionId
+    qaForm = QuestionAnswerForm(data)
     if qaForm.is_valid():
         #increment question answered count
         with transaction.atomic():

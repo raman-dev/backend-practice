@@ -4,5 +4,5 @@ from . import views
 urlpatterns = [
     path("",views.index),
     path("login",views.login_page),
-    path("submit-answer",views.submit_answer)
+    path("submit-answer/<int:questionId>",views.submit_answer)
 ]
