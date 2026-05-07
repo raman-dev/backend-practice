@@ -66,7 +66,7 @@ def submit_answer(request,questionId):
         #increment question answered count
         with transaction.atomic():
             question = Question.objects.filter(id=questionId).first()
-            question.answered_count += 1
+            question.responses += 1
             question.save()
             #increment answer count
             answerId = qaForm.cleaned_data['answer']

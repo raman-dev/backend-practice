@@ -1,0 +1,6 @@
+.poll-option label:hover {
+  background-color: slategray !important;
+}
+.poll-option label:hover span {
+  color: white;
+}/*# sourceMappingURL=styles.css.map */

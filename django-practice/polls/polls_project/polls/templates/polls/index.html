@@ -1,21 +1,24 @@
 {% extends "polls/base.html" %} {% block content %}
-<div class="d-flex justify-content-end">
-  <div class="profile-summary border d-flex flex-column p-2  m-1 mx-2">
-    {% if user.is_authenticated %}
-    <p class="m-0">Logged in as:</p>
-    <h4 class="m-0">{{ user.username }}</h4>
+{% load custom_tags %}
+{% if user.is_authenticated %}
+<div class="d-flex justify-content-end text-capitalize mb-4">
+  <div class="profile-summary border d-flex flex-column p-2  m-1 mx-2" style="min-width: 150px;">
+    
+    <p class="m-0">profile:</p>
+    <h5 class="m-0">{{ user.username }}</h5>
     <form action="/logout" method="POST">
       {% csrf_token %}
       <div class="d-flex justify-content-end my-2 mb-1">
         
-      <button class="btn btn-primary">logout</button>
+      <button class="btn btn-primary text-capitalize w-100">logout</button>
       </div>
     </form>
-    {% endif %}
   </div>
-</div>
+</div>    
+{% endif %}
 
-<div class="container-fluid d-flex justify-content-center align-items-center">
+
+<div class="container-fluid d-flex justify-content-center align-items-center my-2">
    
   <div
     class="poll-container border border-1 rounded-2 p-3"
@@ -27,18 +30,19 @@
 
     <form action="/submit-answer/{{ question.id }}" method="POST">
       {% csrf_token %} {% for answer in answers %}
-      <div class="form-check border rounded-2 p-0">
+      <div class="form-check border rounded-2 p-0 poll-option" data-response-rate="{{ answer.picked|getPercent:question.responses }}">
         <input {% if answered and selectedAnswer.id == answer.id %} checked {% endif %} required
           class="btn-check"
           name="answer"
           type="radio"
           value="{{answer.id}}"
-          id="answer-{{answer.id}}" />
+          id="answer-{{answer.id}}" >
         <label
-          class="btn p-1 px-2 text-start"
+          class="btn p-1 px-2 d-flex justify-content-between"
           for="answer-{{answer.id}}"
           style="width: fit-content; min-width: 400px">
-          {{answer}}
+          <span>{{answer}}</span>
+            <span>{{ answer.picked }} votes</span>
         </label>
       </div>
       {% endfor %}
@@ -47,17 +51,22 @@
       </div>
     </form>
     <div class="stats mt-1">
-      <span>{{ question.answered_count }} responses.</span>
+      <span>{{ question.responses }} responses.</span>
     </div>
   </div>
 </div>
 <script>
+  document.querySelectorAll(".poll-option").forEach(bar => {
+    const percent = bar.dataset.responseRate;
 
-  // const submitBtn = document.querySelector('.submit-btn');
-  // const formSubmit = document.querySelector('form');
-  // formSubmit.addEventListener('submit',(event) => {
-  //     //stop default if nothing is selected
-  //     event.target.querySelector("input:checked");
-  // });
+  bar.style.background = `
+    linear-gradient(
+      to right,
+      #3498db 0%,
+      #3498db ${percent}%,
+      white ${percent}%,
+      white 100%
+    )`;
+});
 </script>
 {% endblock %}

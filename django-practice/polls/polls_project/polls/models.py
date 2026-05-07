@@ -4,13 +4,14 @@ from django.db import models
 #
 class Question(models.Model):
     value = models.CharField(default="Default Poll question",max_length=1024)
-    answered_count = models.IntegerField(default=0,blank=True)
+    responses = models.IntegerField(default=0,blank=True)
     
     def __repr__(self):
         return self.value
     def __str__(self):
         return self.value
     
+
     class Meta:
         constraints = [models.UniqueConstraint(fields=["value"],name="unique_question")]
 

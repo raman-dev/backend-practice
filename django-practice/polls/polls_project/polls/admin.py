@@ -4,7 +4,7 @@ from .models import Question,Answer
 
 @admin.register(Question)
 class QuestionAdmin(admin.ModelAdmin):
-    list_display = ["value","answered_count"]
+    list_display = ["value","responses"]
 
 
 @admin.register(Answer)
