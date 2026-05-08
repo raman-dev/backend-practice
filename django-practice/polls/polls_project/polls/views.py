@@ -19,7 +19,7 @@ def index(request):
         curr = random.randrange(0,n + 1)
 
     randomQuestion = Question.objects.filter(id=curr).first() 
-    context = {
+    context= {
         'question': randomQuestion,
         'answers': Answer.objects.filter(question=randomQuestion),
     }
@@ -61,7 +61,9 @@ def submit_answer(request,questionId):
     data = request.POST.copy()
     data['question'] = questionId
     
-    qaForm = QuestionAnswerForm(data={'question':data['question'],'answer':int(data['answer'][0])})
+    print(data,type(data['answer']))
+    qaForm = QuestionAnswerForm(data={'question':data['question'],'answer':int(data['answer'])})
+    
     if qaForm.is_valid():
         #increment question answered count
         with transaction.atomic():
@@ -73,12 +75,7 @@ def submit_answer(request,questionId):
             answer = Answer.objects.filter(id=answerId).first()
             answer.picked += 1
             answer.save()
-        return render(request,template_name="polls/index.html",context={
-            'question': question,
-            'answers': Answer.objects.filter(question=question),
-            'answered':True,
-            'selectedAnswer':answer
-        })
+        return redirect("/")
     else:
         print(qaForm.errors)    
     return JsonResponse({"message":"Invalid data"},status=400)

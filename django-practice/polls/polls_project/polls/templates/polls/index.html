@@ -31,12 +31,14 @@
     <form action="/submit-answer/{{ question.id }}" method="POST">
       {% csrf_token %} {% for answer in answers %}
       <div class="form-check border rounded-2 p-0 poll-option" data-response-rate="{{ answer.picked|getPercent:question.responses }}">
-        <input {% if answered and selectedAnswer.id == answer.id %} checked {% endif %} required
-          class="btn-check"
-          name="answer"
-          type="radio"
-          value="{{answer.id}}"
-          id="answer-{{answer.id}}" >
+       
+          <input {% if answered and selectedAnswer.id == answer.id %} checked {% endif %} required 
+            class="btn-check"
+            name="answer"
+            type="radio"
+            value="{{answer.id}}"
+            id="answer-{{answer.id}}" >
+       
         <label
           class="btn p-1 px-2 d-flex justify-content-between"
           for="answer-{{answer.id}}"

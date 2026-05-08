@@ -16,9 +16,11 @@ class QuestionAnswerForm(forms.Form):
         answerId = self.cleaned_data.get("answer")
         questionId = self.cleaned_data.get("question")
 
+        print(questionId,answerId)
         q = Question.objects.filter(id=questionId).first()
-        a = Answer.objects.filter(id=answerId).first()
+        a = Answer.objects.filter(question=q,id=answerId).first()
 
+        print(q,a)
         if not q or not a:    
             raise forms.ValidationError("Invalid question or answer")
         
