@@ -1,6 +1,6 @@
 #incrementing the answer count and total answers for a question
 from django import forms
-from .models import Answer,Question
+from .models import Answer,Question, Response
 
 class QuestionAnswerForm(forms.Form):
     answer = forms.IntegerField()
@@ -16,11 +16,9 @@ class QuestionAnswerForm(forms.Form):
         answerId = self.cleaned_data.get("answer")
         questionId = self.cleaned_data.get("question")
 
-        print(questionId,answerId)
         q = Question.objects.filter(id=questionId).first()
         a = Answer.objects.filter(question=q,id=answerId).first()
 
-        print(q,a)
         if not q or not a:    
             raise forms.ValidationError("Invalid question or answer")
         
@@ -28,3 +26,24 @@ class QuestionAnswerForm(forms.Form):
             raise forms.ValidationError("Answer does not belong to question")
         
         return cleaned_data
+
+
+class ResponseForm(forms.ModelForm):
+    class Meta:
+        model = Response
+        fields='__all__'
+    
+    def clean(self):
+        cleaned_data = super().clean()
+            
+        a = self.cleaned_data.get("answer")
+        q = self.cleaned_data.get("question")
+        
+        if not q or not a:    
+            raise forms.ValidationError("Invalid question or answer")
+        
+        if a.question != q:
+            raise forms.ValidationError("Answer does not belong to question")
+        
+        return cleaned_data
+    

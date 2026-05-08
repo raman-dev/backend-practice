@@ -1,5 +1,6 @@
 {% extends "polls/base.html" %} {% block content %}
 {% load custom_tags %}
+
 {% if user.is_authenticated %}
 <div class="d-flex justify-content-end text-capitalize mb-4">
   <div class="profile-summary border d-flex flex-column p-2  m-1 mx-2" style="min-width: 150px;">
@@ -27,31 +28,45 @@
     <h1 class="text-center">Polls</h1>
   </div>
     <p class="current-poll" id="{{question.id}}">{{ question }}</p>
-
-    <form action="/submit-answer/{{ question.id }}" method="POST">
-      {% csrf_token %} {% for answer in answers %}
-      <div class="form-check border rounded-2 p-0 poll-option" data-response-rate="{{ answer.picked|getPercent:question.responses }}">
-       
-          <input {% if answered and selectedAnswer.id == answer.id %} checked {% endif %} required 
-            class="btn-check"
-            name="answer"
-            type="radio"
-            value="{{answer.id}}"
-            id="answer-{{answer.id}}" >
-       
-        <label
-          class="btn p-1 px-2 d-flex justify-content-between"
-          for="answer-{{answer.id}}"
-          style="width: fit-content; min-width: 400px">
-          <span>{{answer}}</span>
+    {% if not answered %}
+    
+      <form action="/submit-answer/{{ question.id }}" method="POST">
+        {% csrf_token %} {% for answer in answers %}
+        <div class="form-check border rounded-2 p-0 poll-option" data-response-rate="{{ answer.picked|getPercent:question.responses }}">
+        
+            <input {% if answered and selectedAnswer.id == answer.id %} checked {% endif %} required 
+              class="btn-check"
+              name="answer"
+              type="radio"
+              value="{{answer.id}}"
+              id="answer-{{answer.id}}" >
+        
+          <label
+            class="btn p-1 px-2 d-flex justify-content-between"
+            for="answer-{{answer.id}}"
+            style="width: fit-content; min-width: 400px">
+            <span>{{answer}}</span>
+              <span>{{ answer.picked }} votes</span>
+          </label>
+        </div>
+        {% endfor %}
+        <div class="d-flex justify-content-end">
+          <button class="btn btn-primary submit-btn" type="submit">Submit</button>
+        </div>
+      </form>
+    {% else %}
+      <ul class="list-group">
+        {% for answer in answers %}
+          <li class="list-group-item d-flex justify-content-between poll-option" {% if userAnswer == answer  %} selected {% endif %}  data-response-rate="{{ answer.picked|getPercent:question.responses }}">
+            <span>{{ answer }}</span>
             <span>{{ answer.picked }} votes</span>
-        </label>
-      </div>
-      {% endfor %}
-      <div class="d-flex justify-content-end">
-        <button class="btn btn-primary submit-btn" type="submit">Submit</button>
-      </div>
-    </form>
+          </li>
+        {% endfor %}
+        
+      </ul>
+    {% endif %}
+
+
     <div class="stats mt-1">
       <span>{{ question.responses }} responses.</span>
     </div>

@@ -7,8 +7,8 @@ from django.db import transaction
 from django.http import JsonResponse
 from django.contrib.auth import authenticate, login, logout
 
-from .forms import QuestionAnswerForm
-from .models import Question,Answer
+from .forms import QuestionAnswerForm,ResponseForm
+from .models import Question,Answer, Response
 
 import random
 
@@ -19,9 +19,21 @@ def index(request):
         curr = random.randrange(0,n + 1)
 
     randomQuestion = Question.objects.filter(id=curr).first() 
+
+    answered = False 
+    userAnswer = None
+    if request.user and request.user.is_authenticated:
+        # answered = randomQuestion.respondents.contains(request.user)
+        response = Response.objects.filter(user=request.user,question=randomQuestion).first()
+        if response:
+            answered = True
+            userAnswer = response.answer
+
     context= {
         'question': randomQuestion,
         'answers': Answer.objects.filter(question=randomQuestion),
+        'answered': answered,
+        'userAnswer': userAnswer
     }
 
     return render(request,"polls/index.html",context=context)
@@ -44,8 +56,6 @@ def login_request(request):
         return redirect("/")
 
     return JsonResponse({"error":"Unauthorized"},status=401)
-    
-    
 
 
 @require_POST
@@ -58,24 +68,32 @@ def logout_request(request):
 @require_POST
 def submit_answer(request,questionId):
     
+    #get user object
     data = request.POST.copy()
     data['question'] = questionId
     
-    print(data,type(data['answer']))
-    qaForm = QuestionAnswerForm(data={'question':data['question'],'answer':int(data['answer'])})
+    # qaForm = QuestionAnswerForm(data={'question':data['question'],'answer':int(data['answer'])})
     
-    if qaForm.is_valid():
+    user = request.user
+    rf = ResponseForm(data={
+        'user':user,
+        'question':data['question'],
+        'answer':int(data['answer'])})
+    if rf.is_valid():#qaForm.is_valid():
         #increment question answered count
         with transaction.atomic():
-            question = Question.objects.filter(id=questionId).first()
+            response = rf.save()
+
+            question = response.question
             question.responses += 1
             question.save()
             #increment answer count
-            answerId = qaForm.cleaned_data['answer']
-            answer = Answer.objects.filter(id=answerId).first()
+            answer = response.answer
             answer.picked += 1
             answer.save()
         return redirect("/")
     else:
-        print(qaForm.errors)    
+        # print(qaForm.errors)
+        print(rf.errors)    
+        return redirect('/')
     return JsonResponse({"message":"Invalid data"},status=400)
