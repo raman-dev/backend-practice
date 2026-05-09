@@ -2,10 +2,11 @@ from urllib import request
 
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST,require_GET
 from django.db import transaction
 from django.http import JsonResponse
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
 
 from .forms import QuestionAnswerForm,ResponseForm
 from .models import Question,Answer, Response
@@ -57,6 +58,21 @@ def login_request(request):
 
     return JsonResponse({"error":"Unauthorized"},status=401)
 
+@require_GET
+def signup(request):
+    return render(request,"polls/signup.html")
+
+@require_POST
+def register_request(request):
+    username = request.POST.username
+    password = request.POST.password
+    
+    if User.objects.filter(username=username).exists():
+        #return an error
+        return redirect("/signup")
+    user = User.objects.create_user(username=username,password=password)
+    
+    return redirect("/login")
 
 @require_POST
 def logout_request(request):
