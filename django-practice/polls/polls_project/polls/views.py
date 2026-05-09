@@ -7,6 +7,7 @@ from django.db import transaction
 from django.http import JsonResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
+from django.contrib.auth.forms import UserCreationForm
 
 from .forms import QuestionAnswerForm,ResponseForm
 from .models import Question,Answer, Response
@@ -47,32 +48,43 @@ def login_page(request):
 @require_POST
 def login_request(request):
 
-    # print(request)
     username = request.POST.get('username')
     password = request.POST.get('password')
-
     user = authenticate(request, username=username, password=password)
+    
     if user is not None:
         login(request,user)
+        print("Logged in")
         return redirect("/")
 
     return JsonResponse({"error":"Unauthorized"},status=401)
 
 @require_GET
-def signup(request):
+def signup_page(request):
     return render(request,"polls/signup.html")
 
 @require_POST
 def register_request(request):
-    username = request.POST.username
-    password = request.POST.password
+    username = request.POST.get("username")
+    password = request.POST.get("password")
     
     if User.objects.filter(username=username).exists():
         #return an error
         return redirect("/signup")
-    user = User.objects.create_user(username=username,password=password)
-    
-    return redirect("/login")
+    ucf = UserCreationForm(data={
+        'username':username,
+        'password1':password,
+        'password2':password
+    })
+    if not ucf.is_valid():
+        print(ucf.errors)
+        return redirect("/signup")
+    ucf.save()
+    return redirect("/success")
+
+@require_GET
+def signup_success(request):
+    return render(request,"polls/success.html")
 
 @require_POST
 def logout_request(request):

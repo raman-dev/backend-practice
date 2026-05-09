@@ -1,7 +1,16 @@
 
+html, body{
+    height: 100%;
+    width: 100%;
+}
+
 .poll-option label:hover{
     background-color: slategray !important;
     span {
         color: white;
     }
+}
+
+.signup-card{
+    margin-top: 90%;
 }
